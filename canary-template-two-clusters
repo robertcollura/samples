@@ -1,0 +1,386 @@
+harnessApiVersion: '1.0'
+type: CANARY
+envName: Production
+failureStrategies:
+- executionScope: WORKFLOW
+  failureTypes:
+  - APPLICATION_ERROR
+  repairActionCode: ROLLBACK_WORKFLOW
+  retryCount: 0
+notificationRules:
+- conditions:
+  - FAILED
+  executionScope: WORKFLOW
+  notificationGroupAsExpression: false
+  userGroupAsExpression: false
+  userGroupIds:
+  - GXFtTUS2Q9Gmo1r4MhqS4g
+phases:
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Canary
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    steps:
+    - type: K8S_CANARY_DEPLOY
+      name: Canary Deployment
+      properties:
+        instanceUnitType: COUNT
+        instances: '1'
+        stateTimeoutInMinutes: 10
+        templateUuid: null
+        templateVariables: null
+        templateVersion: null
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Verify
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    steps:
+    - type: K8S_DELETE
+      name: Canary Delete
+      properties:
+        instanceUnitType: COUNT
+        resources: ${k8s.canaryWorkload}
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Primary
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    steps:
+    - type: K8S_DEPLOYMENT_ROLLING
+      name: Rollout Deployment
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Verify
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Phase 3
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    steps:
+    - type: K8S_CANARY_DEPLOY
+      name: Canary Deployment
+      properties:
+        instanceUnitType: COUNT
+        instances: '1'
+        stateTimeoutInMinutes: 10
+        templateUuid: null
+        templateVariables: null
+        templateVersion: null
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Verify
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    steps:
+    - type: K8S_DELETE
+      name: Canary Delete
+      properties:
+        instanceUnitType: COUNT
+        resources: ${k8s.canaryWorkload}
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes2}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes2}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Phase 4
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    steps:
+    - type: K8S_DEPLOYMENT_ROLLING
+      name: Rollout Deployment
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Verify
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes2}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes2}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+rollbackPhases:
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Rollback Canary
+  phaseNameForRollback: Canary
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    phaseStepNameForRollback: Deploy
+    statusForRollback: SUCCESS
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    phaseStepNameForRollback: Wrap Up
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Rollback Primary
+  phaseNameForRollback: Primary
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    phaseStepNameForRollback: Deploy
+    statusForRollback: SUCCESS
+    steps:
+    - type: K8S_DEPLOYMENT_ROLLING_ROLLBACK
+      name: Rollback Deployment
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    phaseStepNameForRollback: Wrap Up
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Rollback Phase 3
+  phaseNameForRollback: Phase 3
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    phaseStepNameForRollback: Deploy
+    statusForRollback: SUCCESS
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    phaseStepNameForRollback: Wrap Up
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes2}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes2}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+- type: KUBERNETES
+  computeProviderName: harness-demo
+  daemonSet: false
+  infraMappingName: Kubernetes Cluster_ harness-demo_DIRECT_Kubernetes_default-1
+  name: Rollback Phase 4
+  phaseNameForRollback: Phase 4
+  phaseSteps:
+  - type: K8S_PHASE_STEP
+    name: Deploy
+    phaseStepNameForRollback: Deploy
+    statusForRollback: SUCCESS
+    steps:
+    - type: K8S_DEPLOYMENT_ROLLING_ROLLBACK
+      name: Rollback Deployment
+    stepsInParallel: false
+  - type: K8S_PHASE_STEP
+    name: Wrap Up
+    phaseStepNameForRollback: Wrap Up
+    stepsInParallel: false
+  provisionNodes: false
+  serviceName: Order V2 - Rollback version
+  statefulSet: false
+  templateExpressions:
+  - expression: ${Service}
+    fieldName: serviceId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+      value: ${ServiceInfra_Kubernetes2}
+    - name: entityType
+      value: SERVICE
+  - expression: ${ServiceInfra_Kubernetes2}
+    fieldName: infraMappingId
+    metadata:
+    - name: artifactType
+      value: DOCKER
+    - name: relatedField
+    - name: entityType
+      value: INFRASTRUCTURE_MAPPING
+templateExpressions:
+- expression: ${Environment}
+  fieldName: envId
+  metadata:
+  - name: artifactType
+    value: DOCKER
+  - name: relatedField
+  - name: entityType
+    value: ENVIRONMENT
+templatized: true
+userVariables:
+- type: ENTITY
+  description: Variable for Environment entity
+  fixed: false
+  mandatory: true
+  name: Environment
+- type: ENTITY
+  description: Variable for Service entity in Rollback Phase 4
+  fixed: false
+  mandatory: true
+  name: Service
+- type: ENTITY
+  description: Variable for Service Infra-structure entity in Rollback Phase 4
+  fixed: false
+  mandatory: true
+  name: ServiceInfra_Kubernetes2
+- type: ENTITY
+  description: Variable for Service Infra-structure entity in Rollback Primary
+  fixed: false
+  mandatory: true
+  name: ServiceInfra_Kubernetes
